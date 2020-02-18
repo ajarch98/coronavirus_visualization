@@ -10,11 +10,18 @@ URL = (f"https://docs.google.com/"
 
 
 class CoronaVirusGrapher():
+    """
+    Visualize cases of the corona virus
+    """
     def __init__(self, url):
         self.url = url
         self.data = pd.read_csv(self.url).fillna(0)
 
     def get_case_incidents(self):
+        """Return a generator containing the confirmed cases as a tuple of
+        confirmed_cases(dataframe), confirmed_date(dataframe) and date(string)
+
+        """
         for confirmed_case_date, death_date in zip(
                 self.data.filter(like='confirmedcases'),
                 self.data.filter(like='deaths')):
@@ -55,6 +62,7 @@ class CoronaVirusGrapher():
             yield df_cases, df_deaths, death_date[-10:],
 
     def create_graph(self):
+        """Generate the graph based off the confirmed cases and deaths"""
         fig = Figure()
         for df_cases, df_deaths, date in self.get_case_incidents():
             fig.add_trace(Scattergeo(name='Infections',
