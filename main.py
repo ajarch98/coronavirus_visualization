@@ -1,5 +1,6 @@
 """Display a graph of the corona virus spread"""
 import pandas as pd
+import plotly.graph_objs as go
 
 
 URL = (f"https://docs.google.com/"
@@ -61,28 +62,28 @@ class CoronaVirusGrapher():
 
     def create_graph(self):
         """Generate the graph based off the confirmed cases and deaths"""
-        fig = Figure()
-        for df_cases, df_deaths, date in self.get_case_incidents():
-            fig.add_trace(Scattergeo(name='Infections',
-                                     lon=df_cases['longitude'],
-                                     lat=df_cases['latitude'],
-                                     visible=False,
-                                     hovertemplate=df_cases['text'],
-                                     text='Text',
-                                     mode='markers',
-                                     marker=dict(size=10, opacity=0.6,
-                                                 color='Blue',
-                                                 symbol='circle')))
-            fig.add_trace(Scattergeo(name='Deaths',
-                                     lon=df_deaths['longitude'],
-                                     lat=df_deaths['latitude'],
-                                     visible=False,
-                                     hovertemplate=df_deaths['text'],
-                                     text="Text",
-                                     mode='markers',
-                                     marker=dict(size=10, opacity=0.6,
-                                                 color='Red',
-                                                 symbol='circle')))
+        fig = go.Figure()
+        for df_cases, df_deaths, death_date in self.get_case_incidents():
+            fig.add_trace(go.Scattergeo(name='Infections',
+                                        lon=df_cases['longitude'],
+                                        lat=df_cases['latitude'],
+                                        visible=False,
+                                        hovertemplate=df_cases['text'],
+                                        text='Text',
+                                        mode='markers',
+                                        marker=dict(size=10, opacity=0.6,
+                                                    color='Blue',
+                                                    symbol='circle')))
+            fig.add_trace(go.Scattergeo(name='Deaths',
+                                        lon=df_deaths['longitude'],
+                                        lat=df_deaths['latitude'],
+                                        visible=False,
+                                        hovertemplate=df_deaths['text'],
+                                        text="Text",
+                                        mode='markers',
+                                        marker=dict(size=10, opacity=0.6,
+                                                    color='Red',
+                                                    symbol='circle')))
 
             steps = []
             for _, i in enumerate(range(0, len(fig.data), 2)):
