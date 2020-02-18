@@ -2,12 +2,12 @@ import plotly.offline as go_offline
 import plotly.graph_objects as go
 import pandas as pd
 
+URL = 'https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/export?format=csv&id'
 
 class Grapher():
-    def __init__(self):
-        self.url = 'https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/export?format=csv&id'
-        self.data = pd.read_csv(self.url)
-        self.data = self.data.fillna(0)
+    def __init__(self, url):
+        self.url = url
+        self.data = pd.read_csv(self.url).fillna(0)
 
     def create_graph(self):
         fig = go.Figure()
@@ -78,5 +78,5 @@ class Grapher():
 
 
 if __name__ == "__main__":
-    grapher = Grapher()
+    grapher = Grapher(url=URL)
     grapher.create_graph()
