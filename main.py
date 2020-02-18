@@ -1,6 +1,4 @@
-from plotly.graph_objects import Scattergeo, Figure
-
-import plotly.offline
+"""Display a graph of the corona virus spread"""
 import pandas as pd
 
 
@@ -25,7 +23,7 @@ class CoronaVirusGrapher():
         for confirmed_case_date, death_date in zip(
                 self.data.filter(like='confirmedcases'),
                 self.data.filter(like='deaths')):
-            df = self.data[
+            data_frame = self.data[
                 ['latitude',
                  'longitude',
                  'country',
@@ -35,7 +33,7 @@ class CoronaVirusGrapher():
                  ]
             ]
 
-            df_cases = df[df[confirmed_case_date] != 0]
+            df_cases = data_frame[data_frame[confirmed_case_date] != 0]
             df_cases['text'] = (df_cases['country']
                                 + '<br>'
                                 + df_cases['location']
@@ -48,7 +46,7 @@ class CoronaVirusGrapher():
                                 + (df_cases[df_cases.columns[-1]]
                                    .astype(int)).astype(str))
 
-            df_deaths = df[df[death_date] != 0]
+            df_deaths = data_frame[data_frame[death_date] != 0]
             df_deaths['text'] = (df_deaths['country']
                                  + '<br>'
                                  + df_deaths['location']
@@ -59,7 +57,7 @@ class CoronaVirusGrapher():
                                  + 'deaths: '
                                  + (df_deaths[df_deaths.columns[-1]]
                                     .astype(int)).astype(str))
-            yield df_cases, df_deaths, death_date[-10:],
+            yield df_cases, df_deaths, death_date[-10:]
 
     def create_graph(self):
         """Generate the graph based off the confirmed cases and deaths"""
@@ -91,7 +89,7 @@ class CoronaVirusGrapher():
                 step = dict(
                     method="restyle",
                     args=["visible", [False] * len(fig.data)],
-                    label=date,
+                    label=death_date,
                 )
                 step["args"][1][i] = True
                 step["args"][1][i+1] = True
@@ -122,8 +120,10 @@ class CoronaVirusGrapher():
 
 
 if __name__ == "__main__":
-    fig = CoronaVirusGrapher(url=URL).create_graph()
-    fig.show()
-    plotly.offline.plot(fig,
-                        filename='./map_cov.html',
-                        validate=True, auto_open=False)
+    import plotly.offline as pl
+
+    CORONA_GRAPH = CoronaVirusGrapher(url=URL).create_graph()
+    CORONA_GRAPH.show()
+    pl.plot(CORONA_GRAPH,
+            filename='./map_cov.html',
+            validate=True, auto_open=False)
