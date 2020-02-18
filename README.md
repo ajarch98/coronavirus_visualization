@@ -1,4 +1,4 @@
-# coronavirus_visualization
+# Coronavirus Visualization
 Visualizes the spread of the coronavirus
 
 # How to run:
