@@ -15,7 +15,6 @@ class Grapher():
     def create_graph(self):
         fig = Figure()
 
-        date_list = []
         for confirmed_case_date, death_date in zip(self.data.filter(like='confirmedcases'),
                                                    self.data.filter(like='deaths')):
             df = self.data[
@@ -27,7 +26,7 @@ class Grapher():
                  death_date,
                  ]
             ]
-            date_list.append(death_date[-10:])
+
             df_cases = df[df[confirmed_case_date] != 0]
             df_cases['text'] = (df_cases['country']
                                 + '<br>'
@@ -67,11 +66,11 @@ class Grapher():
                                         marker=dict(size=10, opacity=0.6, color='Red', symbol='circle')))
 
             steps = []
-            for index, i in enumerate(range(0, len(fig.data), 2)):
+            for _, i in enumerate(range(0, len(fig.data), 2)):
                 step = dict(
                     method="restyle",
                     args=["visible", [False] * len(fig.data)],
-                    label=date_list[index],
+                    label=death_date[-10:],
                 )
                 step["args"][1][i] = True
                 step["args"][1][i+1] = True
