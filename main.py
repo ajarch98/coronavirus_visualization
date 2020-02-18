@@ -1,5 +1,6 @@
+from plotly.graph_objects import Scattergeo, Figure
+
 import plotly.offline as go_offline
-import plotly.graph_objects as go
 import pandas as pd
 
 URL = 'https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/export?format=csv&id'
@@ -10,8 +11,9 @@ class Grapher():
         self.url = url
         self.data = pd.read_csv(self.url).fillna(0)
 
+
     def create_graph(self):
-        fig = go.Figure()
+        fig = Figure()
 
         date_list = []
         for confirmed_case_date, death_date in zip(self.data.filter(like='confirmedcases'),
@@ -47,7 +49,7 @@ class Grapher():
                                  + 'deaths: '
                                  + (df_deaths[df_deaths.columns[-1]].astype(int)).astype(str))
 
-            fig.add_trace(go.Scattergeo(name='Infections',
+            fig.add_trace(Scattergeo(name='Infections',
                                         lon=df_cases['longitude'],
                                         lat=df_cases['latitude'],
                                         visible=False,
@@ -55,7 +57,7 @@ class Grapher():
                                         text='Text',
                                         mode='markers',
                                         marker=dict(size=10, opacity=0.6, color='Blue', symbol='circle')))
-            fig.add_trace(go.Scattergeo(name='Deaths',
+            fig.add_trace(Scattergeo(name='Deaths',
                                         lon=df_deaths['longitude'],
                                         lat=df_deaths['latitude'],
                                         visible=False,
@@ -63,6 +65,7 @@ class Grapher():
                                         text="Text",
                                         mode='markers',
                                         marker=dict(size=10, opacity=0.6, color='Red', symbol='circle')))
+
             steps = []
             for index, i in enumerate(range(0, len(fig.data), 2)):
                 step = dict(
