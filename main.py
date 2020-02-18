@@ -1,6 +1,6 @@
 from plotly.graph_objects import Scattergeo, Figure
 
-import plotly.offline as go_offline
+import plotly.offline
 import pandas as pd
 
 URL = 'https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/export?format=csv&id'
@@ -11,10 +11,7 @@ class Grapher():
         self.url = url
         self.data = pd.read_csv(self.url).fillna(0)
 
-
-    def create_graph(self):
-        fig = Figure()
-
+    def get_case_incidents(self):
         for confirmed_case_date, death_date in zip(self.data.filter(like='confirmedcases'),
                                                    self.data.filter(like='deaths')):
             df = self.data[
@@ -47,30 +44,35 @@ class Grapher():
                                  + '<br>'
                                  + 'deaths: '
                                  + (df_deaths[df_deaths.columns[-1]].astype(int)).astype(str))
+            yield df_cases, df_deaths, death_date[-10:],
+            
 
+    def create_graph(self):
+        fig = Figure()
+        for df_cases, df_deaths, date in self.get_case_incidents():
             fig.add_trace(Scattergeo(name='Infections',
-                                        lon=df_cases['longitude'],
-                                        lat=df_cases['latitude'],
-                                        visible=False,
-                                        hovertemplate=df_cases['text'],
-                                        text='Text',
-                                        mode='markers',
-                                        marker=dict(size=10, opacity=0.6, color='Blue', symbol='circle')))
+                                     lon=df_cases['longitude'],
+                                     lat=df_cases['latitude'],
+                                     visible=False,
+                                     hovertemplate=df_cases['text'],
+                                     text='Text',
+                                     mode='markers',
+                                     marker=dict(size=10, opacity=0.6, color='Blue', symbol='circle')))
             fig.add_trace(Scattergeo(name='Deaths',
-                                        lon=df_deaths['longitude'],
-                                        lat=df_deaths['latitude'],
-                                        visible=False,
-                                        hovertemplate=df_deaths['text'],
-                                        text="Text",
-                                        mode='markers',
-                                        marker=dict(size=10, opacity=0.6, color='Red', symbol='circle')))
+                                     lon=df_deaths['longitude'],
+                                     lat=df_deaths['latitude'],
+                                     visible=False,
+                                     hovertemplate=df_deaths['text'],
+                                     text="Text",
+                                     mode='markers',
+                                     marker=dict(size=10, opacity=0.6, color='Red', symbol='circle')))
 
             steps = []
             for _, i in enumerate(range(0, len(fig.data), 2)):
                 step = dict(
                     method="restyle",
                     args=["visible", [False] * len(fig.data)],
-                    label=death_date[-10:],
+                    label=date,
                 )
                 step["args"][1][i] = True
                 step["args"][1][i+1] = True
@@ -94,12 +96,13 @@ class Grapher():
                           title='Rise of the Novel Coronavirus<br>A Python Data Visualization by Advait Joshi', title_x=0.5,
                           legend_title='Key',
                           height=600)
-        fig.show()
-        go_offline.plot(fig, filename='./map_cov.html',
-                        validate=True, auto_open=False
-                        )
+        return fig
 
 
 if __name__ == "__main__":
-    grapher = Grapher(url=URL)
-    grapher.create_graph()
+    fig = Grapher(url=URL).create_graph()
+    fig.show()
+    plotly.offline.plot(fig,
+                        filename='./map_cov.html',
+                        validate=True, auto_open=False)
+
