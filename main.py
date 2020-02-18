@@ -6,7 +6,7 @@ import pandas as pd
 URL = 'https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/export?format=csv&id'
 
 
-class Grapher():
+class CoronaVirusGrapher():
     def __init__(self, url):
         self.url = url
         self.data = pd.read_csv(self.url).fillna(0)
@@ -100,7 +100,7 @@ class Grapher():
 
 
 if __name__ == "__main__":
-    fig = Grapher(url=URL).create_graph()
+    fig = CoronaVirusGrapher(url=URL).create_graph()
     fig.show()
     plotly.offline.plot(fig,
                         filename='./map_cov.html',
