@@ -12,41 +12,57 @@ class Grapher():
 
     def create_graph(self):
         fig = go.Figure()
-        col_names = self.data.columns
 
         date_list = []
-        for i in range(5, len(self.data.columns), 2):
-            cases_col = i
-            cases_col_name = col_names[cases_col]
-            deaths_col = i + 1
-            deaths_col_name = col_names[deaths_col]
+        for confirmed_case_date, death_date in zip(self.data.filter(like='confirmedcases'),
+                                                   self.data.filter(like='deaths')):
+            df = self.data[
+                ['latitude',
+                 'longitude',
+                 'country',
+                 'location',
+                 confirmed_case_date,
+                 death_date,
+                 ]
+            ]
+            date_list.append(death_date[-10:])
+            df_cases = df[df[confirmed_case_date] != 0]
+            df_cases['text'] = (df_cases['country']
+                                + '<br>'
+                                + df_cases['location']
+                                + '<br>'
+                                + 'confirmed cases: '
+                                + (df_cases[df_cases.columns[-2]].astype(int)).astype(str)
+                                + '<br>'
+                                + 'deaths: '
+                                + (df_cases[df_cases.columns[-1]].astype(int)).astype(str))
 
-            df = self.data[['latitude', 'longitude', 'country',
-                            'location', col_names[cases_col], col_names[deaths_col]]]
-            date = df[col_names[deaths_col]].name[7:17]
-            date_list.append(date)
+            df_deaths = df[df[death_date] != 0]
+            df_deaths['text'] = (df_deaths['country']
+                                 + '<br>'
+                                 + df_deaths['location']
+                                 + '<br>' + 'confirmed cases: '
+                                 + (df_deaths[df_deaths.columns[-2]].astype(int)).astype(str)
+                                 + '<br>'
+                                 + 'deaths: '
+                                 + (df_deaths[df_deaths.columns[-1]].astype(int)).astype(str))
 
-            df_cases = df[df[cases_col_name] != 0]
-            df_cases['text'] = df_cases['country'] + '<br>' + df_cases['location'] + '<br>' + 'confirmed cases: ' + (df_cases[df_cases.columns[-2]].astype(int)).astype(str) + '<br>' +\
-                'deaths: ' + (df_cases[df_cases.columns[-1]].astype(int))\
-                .astype(str)
-            cases_lat = df_cases['latitude']
-            cases_lng = df_cases['longitude']
-
-            df_deaths = df[df[deaths_col_name] != 0]
-            deaths_lat = df_deaths['latitude']
-            deaths_lng = df_deaths['longitude']
-            df_deaths['text'] = df_deaths['country'] + '<br>' + df_deaths['location'] + '<br>' + 'confirmed cases: ' + (df_deaths[df_deaths.columns[-2]].astype(int)).astype(str) + '<br>' +\
-                'deaths: ' + (df_deaths[df_deaths.columns[-1]].astype(int))\
-                .astype(str)
-
-            fig.add_trace(go.Scattergeo(name='Infections', lon=cases_lng, lat=cases_lat, visible=False, hovertemplate=df_cases['text'], text='Text', mode='markers',
-                                        marker=dict(
-                                            size=10, opacity=0.6, color='Blue', symbol='circle'),
-                                        ))
-            fig.add_trace(go.Scattergeo(name='Deaths', lon=deaths_lng, lat=deaths_lat, visible=False, hovertemplate=df_deaths['text'], text="Text", mode='markers',
+            fig.add_trace(go.Scattergeo(name='Infections',
+                                        lon=df_cases['longitude'],
+                                        lat=df_cases['latitude'],
+                                        visible=False,
+                                        hovertemplate=df_cases['text'],
+                                        text='Text',
+                                        mode='markers',
+                                        marker=dict(size=10, opacity=0.6, color='Blue', symbol='circle')))
+            fig.add_trace(go.Scattergeo(name='Deaths',
+                                        lon=df_deaths['longitude'],
+                                        lat=df_deaths['latitude'],
+                                        visible=False,
+                                        hovertemplate=df_deaths['text'],
+                                        text="Text",
+                                        mode='markers',
                                         marker=dict(size=10, opacity=0.6, color='Red', symbol='circle')))
-
             steps = []
             for index, i in enumerate(range(0, len(fig.data), 2)):
                 step = dict(
@@ -78,7 +94,8 @@ class Grapher():
                           height=600)
         fig.show()
         go_offline.plot(fig, filename='./map_cov.html',
-                        validate=True, auto_open=False)
+                        validate=True, auto_open=False
+                        )
 
 
 if __name__ == "__main__":
