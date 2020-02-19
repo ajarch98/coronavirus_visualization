@@ -13,8 +13,7 @@ class CoronaVirusGrapher():
     Visualize cases of the corona virus
     """
     def __init__(self, url):
-        self.url = url
-        self.data = pd.read_csv(self.url).fillna(0)
+        self.data = pd.read_csv(url).fillna(0)
 
     def get_case_incidents(self):
         """Return a generator containing the confirmed cases as a tuple of
