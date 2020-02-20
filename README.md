@@ -1,4 +1,4 @@
-# coronavirus_visualization
+# Coronavirus Visualization
 Visualizes the spread of the coronavirus
 
 # How to run:
@@ -6,7 +6,8 @@ Visualizes the spread of the coronavirus
 - Install pipenv using `pip install pipenv`
 - Enter working directory `cd coronavirus_visualization`
 - Enter pipenv and install dependencies using `pipenv shell` and `pipenv install`
-- Run program with `python main.py`
+- Run program with `python main.py`. The file: `map_cov.html` will be
+  auto-generated at the project's root and you can view it on your browser.
 
 # Sources:
 Data compiled at https://docs.google.com/spreadsheets/d/18X1VM1671d99V_yd-cnUI1j8oSG2ZgfU_q1HfOizErA/ from:
